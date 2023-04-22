@@ -1,0 +1,127 @@
+.formContainer {
+  max-width: 700px;
+  width: 100%;
+  background-color: white;
+  padding: 25px 30px;
+  border-radius: 5px;
+}
+
+.formContainer .title {
+  font-size: 35px;
+  font-weight: 500;
+  position: relative;
+}
+
+.formContainer .title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 30px;
+  background: linear-gradient(135deg, #b6fbff, #83a4d4);
+}
+
+.userInfo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 20px 0 12px 0;
+}
+
+.userInfo .inputBox {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.inputBox label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.inputBox span {
+  color: orange;
+  font-size: small;
+}
+
+.userInfo .inputBox .formInput {
+  height: 35px;
+  width: 100%;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+}
+
+.userInfo::-webkit-scrollbar {
+  width: 5px;
+  background-color: #93edc7;
+}
+
+.btnGrad {
+  width: 100%;
+  margin-top: 20px;
+  background-image: linear-gradient(
+    to right,
+    #83a4d4 0%,
+    #b6fbff 51%,
+    #83a4d4 100%
+  );
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: #575f5f;
+  font-weight: bold;
+  font-size: medium;
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+  cursor: pointer;
+}
+
+.btnGrad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btnGrad:disabled {
+  background-image: linear-gradient(135deg, #d6dbd9, #5f5f5f);
+}
+
+.successMessage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: x-large;
+  color: #48706f;
+}
+
+.icon {
+  margin-top: 20px;
+  font-size: 20vh;
+}
+
+/* Mobile */
+@media (max-width: 584px) {
+  .formContainer {
+    max-width: 100%;
+  }
+
+  .formContainer .title {
+    font-size: 25px;
+  }
+
+  .userInfo .inputBox {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+}
