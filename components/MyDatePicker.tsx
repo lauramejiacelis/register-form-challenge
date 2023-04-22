@@ -6,7 +6,7 @@ import styles from '../styles/RegisterForm.module.css';
 const DatePickerField = ({ field, form, ...props }: any) => (
   <div>
     <DatePicker
-      dateFormat="yyyy/mm/dd"
+      dateFormat="yyyy/MM/dd"
       {...field}
       selected={field.value}
       onChange={(val) => form.setFieldValue(field.name, val)}

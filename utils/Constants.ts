@@ -251,7 +251,7 @@ export const COUNTRIES = [
   'Zimbabue',
 ];
 
-export const GENDERS = ['Female', 'Male', 'Other', 'Prefer not  to say'];
+export const GENDERS = ['Femenino', 'Masculino', 'Otro', 'Prefiero no decirlo'];
 
 export const DOCUMENTTYPES = [
   'Cédula de ciudadanía',

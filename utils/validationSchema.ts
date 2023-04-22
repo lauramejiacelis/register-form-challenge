@@ -6,7 +6,7 @@ const tenDigits = 'Deben ser exactamente 10 dígitos';
 const tooShort = 'Muy corta';
 const tooLong = 'Muy larga';
 
-export const formSchema = Yup.object().shape({
+export const stepOneSchema = Yup.object().shape({
   country: Yup.string().required(isRequiredMessage),
   gender: Yup.string().required(isRequiredMessage),
   firstName: Yup.string().required(isRequiredMessage).min(3, tooShort),
@@ -24,6 +24,10 @@ export const formSchema = Yup.object().shape({
     .required(isRequiredMessage),
   documentImageFront: Yup.string().required(isRequiredMessage),
   documentImageBack: Yup.string().required(isRequiredMessage),
+  
+});
+
+export const stepTwoSchema = Yup.object().shape({
   email: Yup.string().email().required(isRequiredMessage),
   password: Yup.string()
     .min(6, tooShort)
@@ -40,6 +44,9 @@ export const formSchema = Yup.object().shape({
     .required(isRequiredMessage)
     .typeError(mustBeNumber)
     .test('len', tenDigits, (val) => val.toString().length === 10),
+});
+
+export const stepThreeSchema = Yup.object().shape({
   address: Yup.string().required(isRequiredMessage),
   zipCode: Yup.number()
     .required(isRequiredMessage)

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { formSchema } from '@/utils/validationSchema';
+import { stepOneSchema, stepTwoSchema, stepThreeSchema } from '@/utils/validationSchema';
 import { COUNTRIES, GENDERS, DOCUMENTTYPES } from '@/utils/Constants';
 import DatePickerField from './MyDatePicker';
 import Modal from './Modal';
@@ -28,12 +28,8 @@ interface FormValues {
   zipCode: number;
 }
 
-const RegisterForm = () => {
-  const [formData, setFormData] = useState<Object>({});
-
-  const { isOpen, toggle } = useModal();
-
-  const initialValues: FormValues = {
+const MultiStepForm = () => {
+  const [data, setData] = useState<FormValues>({
     country: '',
     gender: '',
     firstName: '',
@@ -50,26 +46,68 @@ const RegisterForm = () => {
     cel: 0,
     address: '',
     zipCode: 0,
-  };
+  });
 
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
-    setFormData(values);
-    toggle();
-    //formik.resetForm();
-  };
+  const [formData, setFormData] = useState<Object>({});
+
+  const { isOpen, toggle } = useModal();
+
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const handleNextStep = (newData:any, final=false) => { //review this type
+    setData((prev)=> ({...prev, ...newData}))
+
+    if (final){
+      setFormData(newData); //eye
+      toggle();
+      return //if final don't increment 13.09
+    }
+
+    setCurrentStep((prev) => prev + 1)
+  }
+
+  const handlePrevStep = (newData:any) => { //review this type
+    setData((prev)=> ({...prev, ...newData}))
+    setCurrentStep((prev) => prev - 1)
+  }
+
+  console.log('current step '+ currentStep)
+
+  const steps = [<StepOne next={handleNextStep} data={data}/>, <StepTwo next={handleNextStep} prev={handlePrevStep} data={data}/>, <StepThree next={handleNextStep} prev={handlePrevStep} data={data}/>]
 
   return (
     <>
-      <Formik
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        validationSchema={formSchema}
-      >
-        {(formik) => (
+      <div className={styles.formContainer}>
+        <div className={styles.title}>Formulario de Registro</div>
+        {steps[currentStep]}
+      </div>
+      <Modal isOpen={isOpen} toggle={toggle}>
+        <div className={styles.successMessage}>
+          <p>Your data was sent successfully!!!</p>
+          <div>
+            <BsFillClipboardCheckFill className={styles.icon} />
+          </div>
+        </div>
+      </Modal>
+    </>
+  );
+};
+
+export default MultiStepForm;
+
+const StepOne = (props:any)=> {//review this type
+  const handleSubmit = (values: FormValues) => {
+    console.log(values);
+    props.next(values)
+  };
+  return(
+    <Formik
+      initialValues={props.data}
+      onSubmit={handleSubmit}
+      validationSchema={stepOneSchema}>
+      {
+        (formik)=>(
           <Form>
-            <div className={styles.formContainer}>
-              <div className={styles.title}>Formulario de Registro</div>
               <div className={styles.userInfo}>
                 <div className={styles.inputBox}>
                   <label htmlFor="country">País</label>
@@ -221,6 +259,40 @@ const RegisterForm = () => {
                   <ErrorMessage name="documentImageBack" component="span" />
                 </div>
 
+              </div>
+
+              <button
+                className={styles.btnGrad}
+                type="submit"
+                disabled={!formik.isValid || !formik.dirty}
+              >
+                Next
+              </button>
+            
+          </Form>
+        )
+      }
+    </Formik>
+  )
+}
+
+const StepTwo = (props:any)=> {//review this type
+  const handleSubmit = (values: FormValues) => {
+    console.log(values);
+    props.next(values)
+  };
+
+  return(
+    <Formik
+      initialValues={props.data}
+      onSubmit={handleSubmit}
+      validationSchema={stepTwoSchema}>
+        {
+        (formik)=>(
+          <Form>
+             
+              <div className={styles.userInfo}>
+
                 <div className={styles.inputBox}>
                   <label htmlFor="email">Correo Electrónico</label>
                   <Field
@@ -279,6 +351,49 @@ const RegisterForm = () => {
                   <ErrorMessage name="cel" component="span" />
                 </div>
 
+              </div>
+
+              <button
+                className={styles.btnGrad}
+                type="button"
+                onClick={()=> props.prev(formik.values)}
+              >
+                Back
+              </button>
+
+              <button
+                className={styles.btnGrad}
+                type="submit"
+                disabled={!formik.isValid || !formik.dirty}
+              >
+                Next
+              </button>
+            
+          </Form>
+        )
+      }
+    </Formik>
+  )
+}
+
+const StepThree = (props:any)=> { //review this type
+  const handleSubmit = (values: FormValues) => {
+    console.log(values);
+    props.next(values, true)
+    //formik.resetForm();
+  };
+
+  return(
+    <Formik
+      initialValues={props.data}
+      onSubmit={handleSubmit}
+      validationSchema={stepThreeSchema}>
+      {
+        (formik)=>(
+          <Form>
+             
+              <div className={styles.userInfo}>
+         
                 <div className={styles.inputBox}>
                   <label htmlFor="address">Dirección de Residencia: </label>
                   <Field
@@ -304,25 +419,23 @@ const RegisterForm = () => {
 
               <button
                 className={styles.btnGrad}
+                type="button"
+                onClick={()=> props.prev(formik.values)}
+              >
+                Back
+              </button>
+
+              <button
+                className={styles.btnGrad}
                 type="submit"
                 disabled={!formik.isValid || !formik.dirty}
               >
                 Submit
               </button>
-            </div>
+            
           </Form>
-        )}
-      </Formik>
-      <Modal isOpen={isOpen} toggle={toggle}>
-        <div className={styles.successMessage}>
-          <p>Your data was sent successfully!!!</p>
-          <div>
-            <BsFillClipboardCheckFill className={styles.icon} />
-          </div>
-        </div>
-      </Modal>
-    </>
-  );
-};
-
-export default RegisterForm;
+        )
+      }
+    </Formik>
+  )
+}
