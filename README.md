@@ -1,6 +1,6 @@
 # register-form-challenge
 
-This is a complete register form made with formik and yup validation
+This is a complete register form made with formik and yup validation, has three steps implemented with material UI
 
 ## Technologies
 
@@ -24,10 +24,11 @@ yarn dev
 pnpm dev
 ```
 
-[comment]: <## Usage>
-[comment]: <Feel free to fill out the form and experience the different validations>
-[comment]: < Keep in mind that the submit button will only be enabled (gets color) when all the fields are correctly filled out>
+## Usage>
+Feel free to fill out the form and experience the different validations
+Keep in mind that the submit button will only be enabled (gets color) when all the fields are correctly filled out
 
-[comment]:<![Submit Button](https://res.cloudinary.com/lauram2celis/image/upload/v1681759747/readme-helpers/SubmitButton_mcvhzk.jpg)>
+![Submit Button](https://res.cloudinary.com/lauram2celis/image/upload/v1682305081/projects/Screenshot_2023-04-23_215641_pyoyxt.png)
 
-[comment]: <## You can see the app deployed here ↓>
+## You can see the app deployed here ↓
+https://register-form-challenge.vercel.app/
