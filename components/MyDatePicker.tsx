@@ -11,9 +11,11 @@ const DatePickerField = ({ field, form, ...props }: any) => (
       selected={field.value}
       onChange={(val) => form.setFieldValue(field.name, val)}
       className={styles.formInput}
+      maxDate={new Date()}
       showYearDropdown
       scrollableYearDropdown
       showDisabledMonthNavigation
+      yearDropdownItemNumber={50}
     />
   </div>
 );

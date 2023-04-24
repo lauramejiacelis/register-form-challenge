@@ -1,12 +1,21 @@
 import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { stepOneSchema, stepTwoSchema, stepThreeSchema } from '@/utils/validationSchema';
+import { FormInput, SelectInput } from './FormInput';
+import {
+  stepOneSchema,
+  stepTwoSchema,
+  stepThreeSchema,
+} from '@/utils/validationSchema';
 import { COUNTRIES, GENDERS, DOCUMENTTYPES } from '@/utils/Constants';
 import DatePickerField from './MyDatePicker';
 import Modal from './Modal';
 import useModal from '@/hooks/useModal';
 import { BsFillClipboardCheckFill, BsCheckLg } from 'react-icons/bs';
 import { HiXMark } from 'react-icons/hi2';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+
 import styles from '../styles/RegisterForm.module.css';
 
 interface FormValues {
@@ -52,32 +61,54 @@ const MultiStepForm = () => {
 
   const { isOpen, toggle } = useModal();
 
-  const [currentStep, setCurrentStep] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const handleNextStep = (newData:any, final=false) => { //review this type
-    setData((prev)=> ({...prev, ...newData}))
+  const handleNextStep = (newData: any, final = false) => {
+    setData((prev) => ({ ...prev, ...newData }));
 
-    if (final){
-      setFormData(newData); //eye
-      toggle();
-      return //if final don't increment 13.09
-    }
+    setCurrentStep((prev: number) => {
+      if (prev + 1 === steps.length) {
+        setFormData(newData);
+        toggle();
+        return prev;
+      }
+      return prev + 1;
+    });
+  };
 
-    setCurrentStep((prev) => prev + 1)
-  }
+  const handlePrevStep = (newData: any) => {
+    setData((prev) => ({ ...prev, ...newData }));
+    setCurrentStep((prev) => prev - 1);
+  };
 
-  const handlePrevStep = (newData:any) => { //review this type
-    setData((prev)=> ({...prev, ...newData}))
-    setCurrentStep((prev) => prev - 1)
-  }
-
-  console.log('current step '+ currentStep)
-
-  const steps = [<StepOne next={handleNextStep} data={data}/>, <StepTwo next={handleNextStep} prev={handlePrevStep} data={data}/>, <StepThree next={handleNextStep} prev={handlePrevStep} data={data}/>]
+  const steps = [
+    <StepOne key={0} next={handleNextStep} data={data} label={'Paso 1'} />,
+    <StepTwo
+      key={1}
+      next={handleNextStep}
+      prev={handlePrevStep}
+      data={data}
+      label={'Paso 2'}
+    />,
+    <StepThree
+      key={2}
+      next={handleNextStep}
+      prev={handlePrevStep}
+      data={data}
+      label={'Paso 3'}
+    />,
+  ];
 
   return (
     <>
       <div className={styles.formContainer}>
+        <Stepper alternativeLabel activeStep={currentStep}>
+          {steps.map((child) => (
+            <Step key={child.props.label}>
+              <StepLabel>{child.props.label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
         <div className={styles.title}>Formulario de Registro</div>
         {steps[currentStep]}
       </div>
@@ -95,347 +126,295 @@ const MultiStepForm = () => {
 
 export default MultiStepForm;
 
-const StepOne = (props:any)=> {//review this type
+const StepOne = (props: any) => {
+  //review this type
   const handleSubmit = (values: FormValues) => {
     console.log(values);
-    props.next(values)
+    props.next(values);
   };
-  return(
+  return (
     <Formik
       initialValues={props.data}
       onSubmit={handleSubmit}
-      validationSchema={stepOneSchema}>
-      {
-        (formik)=>(
-          <Form>
-              <div className={styles.userInfo}>
-                <div className={styles.inputBox}>
-                  <label htmlFor="country">País</label>
-                  <Field
-                    className={styles.formInput}
-                    name="country"
-                    as="select"
-                    label="country"
-                    type="text"
-                    error={formik.errors.country}
-                  >
-                    <option value="" selected disabled hidden>
-                      Seleccione
-                    </option>
-                    {COUNTRIES.map((country, index) => (
-                      <option key={index} value={country.toLowerCase()}>
-                        {country}
-                      </option>
-                    ))}
-                  </Field>
-                  <ErrorMessage name="country" component="span" />
-                </div>
-                <div className={styles.inputBox}>
-                  <label htmlFor="gender">Género</label>
-                  <Field
-                    className={styles.formInput}
-                    name="gender"
-                    as="select"
-                    label="gender"
-                    type="text"
-                    error={formik.errors.gender}
-                  >
-                    <option value="" selected disabled hidden>
-                      Seleccione
-                    </option>
-                    {GENDERS.map((gender, index) => (
-                      <option key={index} value={gender.toLowerCase()}>
-                        {gender}
-                      </option>
-                    ))}
-                  </Field>
-                  <ErrorMessage name="gender" component="span" />
-                </div>
+      validationSchema={stepOneSchema}
+      label="step 1"
+    >
+      {(formik) => (
+        <Form>
+          <div className={styles.userInfo}>
+            <div className={styles.inputBox}>
+              <SelectInput
+                label="País "
+                name="country"
+                type="text"
+                className={styles.formInput}
+              >
+                <option value="" selected disabled hidden>
+                  Seleccione
+                </option>
+                {COUNTRIES.map((country) => (
+                  <option key={country} value={country.toLowerCase()}>
+                    {country}
+                  </option>
+                ))}
+              </SelectInput>
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="firstName">
-                    Primer Nombre:
-                    {formik.errors.firstName ? (
-                      <HiXMark style={{ color: 'red' }} />
-                    ) : (
-                      <BsCheckLg style={{ color: '#05cc30' }} />
-                    )}
-                  </label>
+            <div className={styles.inputBox}>
+              <SelectInput
+                label="Género: "
+                name="gender"
+                type="text"
+                className={styles.formInput}
+              >
+                <option value="" selected disabled hidden>
+                  Seleccione
+                </option>
+                {GENDERS.map((gender) => (
+                  <option key={gender} value={gender.toLowerCase()}>
+                    {gender}
+                  </option>
+                ))}
+              </SelectInput>
+            </div>
 
-                  <Field
-                    className={styles.formInput}
-                    name="firstName"
-                    as="input"
-                    type="text"
-                    error={formik.errors.firstName}
-                  />
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Primer Nombre: "
+                name="firstName"
+                type="text"
+                className={styles.formInput}
+                error={formik.errors.firstName}
+              />
+            </div>
 
-                  <ErrorMessage name="firstName" component="span" />
-                </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Segundo Nombre "
+                name="lastName"
+                type="text"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="lastName">Segundo Nombre: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="lastName"
-                    as="input"
-                    type="text"
-                    error={formik.errors.lastName}
-                  />
-                  <ErrorMessage name="lastName" component="span" />
-                </div>
-
-                <div className={styles.inputBox}>
-                  <label htmlFor="dateOfBirth">Fecha de Nacimiento: </label>
-                  <div>
-                    <Field
-                      className={styles.formInput}
-                      name="dateOfBirth"
-                      component={DatePickerField}
-                    />
-                  </div>
-
-                  <ErrorMessage name="dateOfBirth" component="span" />
-                </div>
-
-                <div className={styles.inputBox}>
-                  <label htmlFor="documentType">Tipo de Documento: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="documentType"
-                    as="select"
-                    type="text"
-                    error={formik.errors.documentType}
-                  >
-                    <option value="" selected disabled hidden>
-                      Seleccione
-                    </option>
-                    {DOCUMENTTYPES.map((documentType, index) => (
-                      <option key={index} value={documentType.toLowerCase()}>
-                        {documentType}
-                      </option>
-                    ))}
-                  </Field>
-                  <ErrorMessage name="documentType" component="span" />
-                </div>
-
-                <div className={styles.inputBox}>
-                  <label htmlFor="documentNumber">Número de Documento: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="documentNumber"
-                    as="input"
-                    error={formik.errors.documentNumber}
-                    type="text"
-                  />
-                  <ErrorMessage name="documentNumber" component="span" />
-                </div>
-
-                <div className={styles.inputBox}>
-                  <label htmlFor="documentImageFront">
-                    Foto Documento - Frente:{' '}
-                  </label>
-                  <Field
-                    name="documentImageFront"
-                    as="input"
-                    error={formik.errors.documentImageFront}
-                    type="file"
-                    accept="image/png, image/jpeg"
-                  />
-                  <ErrorMessage name="documentImageFront" component="span" />
-                </div>
-
-                <div className={styles.inputBox}>
-                  <label htmlFor="documentImageBack">
-                    Foto Documento - Reverso:{' '}
-                  </label>
-                  <Field
-                    name="documentImageBack"
-                    as="input"
-                    error={formik.errors.documentImageBack}
-                    type="file"
-                    accept="image/png, image/jpeg"
-                  />
-                  <ErrorMessage name="documentImageBack" component="span" />
-                </div>
-
+            <div className={styles.inputBox}>
+              <label htmlFor="dateOfBirth">
+                Fecha de Nacimiento 
+                {(formik.touched.dateOfBirth && formik.errors.dateOfBirth) || formik.values.dateOfBirth === formik.initialValues.dateOfBirth ? (
+                  <HiXMark style={{ color: 'red' }} />
+                ) : (
+                  <BsCheckLg style={{ color: '#05cc30' }} />
+                )}
+              </label>
+              <div>
+                <Field
+                  className={styles.formInput}
+                  name="dateOfBirth"
+                  component={DatePickerField}
+                />
               </div>
 
-              <button
-                className={styles.btnGrad}
-                type="submit"
-                disabled={!formik.isValid || !formik.dirty}
-              >
-                Next
-              </button>
-            
-          </Form>
-        )
-      }
-    </Formik>
-  )
-}
+              <ErrorMessage name="dateOfBirth" component="span" />
+            </div>
 
-const StepTwo = (props:any)=> {//review this type
+            <div className={styles.inputBox}>
+              <SelectInput
+                label="Tipo de Documento: "
+                name="documentType"
+                type="text"
+                className={styles.formInput}
+              >
+                <option value="" selected disabled hidden>
+                  Seleccione
+                </option>
+                {DOCUMENTTYPES.map((documentType) => (
+                  <option key={documentType} value={documentType.toLowerCase()}>
+                    {documentType}
+                  </option>
+                ))}
+              </SelectInput>
+            </div>
+
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Número de Documento "
+                name="documentNumber"
+                type="text"
+                className={styles.formInput}
+              />
+            </div>
+
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Foto Documento - Frente "
+                name="documentImageFront"
+                type="file"
+                accept="image/png, image/jpeg"
+                value={undefined}
+              />
+            </div>
+
+            <div className={styles.inputBox}>
+            <FormInput
+                label="Foto Documento - Reverso "
+                name="documentImageBack"
+                type="file"
+                accept="image/png, image/jpeg"
+                value={undefined}
+              />
+            </div>
+          </div>
+
+          <button
+            className={styles.btnGrad}
+            type="submit"
+            disabled={!formik.isValid || !formik.dirty}
+          >
+            Next
+          </button>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+const StepTwo = (props: any) => {
+  //review this type
   const handleSubmit = (values: FormValues) => {
     console.log(values);
-    props.next(values)
+    props.next(values);
   };
 
-  return(
+  return (
     <Formik
       initialValues={props.data}
       onSubmit={handleSubmit}
-      validationSchema={stepTwoSchema}>
-        {
-        (formik)=>(
-          <Form>
-             
-              <div className={styles.userInfo}>
+      validationSchema={stepTwoSchema}
+      label="step 2"
+    >
+      {(formik) => (
+        <Form>
+          <div className={styles.userInfo}>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Correo Electrónico"
+                name="email"
+                type="email"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="email">Correo Electrónico</label>
-                  <Field
-                    className={styles.formInput}
-                    name="email"
-                    as="input"
-                    type="email"
-                    error={formik.errors.email}
-                  />
-                  <ErrorMessage name="email" component="span" />
-                </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Contraseña"
+                name="password"
+                type="password"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="password">Contraseña</label>
-                  <Field
-                    className={styles.formInput}
-                    name="password"
-                    as="input"
-                    type="password"
-                    error={formik.errors.password}
-                  />
-                  <ErrorMessage name="password" component="span" />
-                </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Confirmar Contraseña"
+                name="confirmPassword"
+                type="password"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="password">Confirmar Contraseña</label>
-                  <Field
-                    className={styles.formInput}
-                    name="confirmPassword"
-                    as="input"
-                    type="password"
-                    error={formik.errors.confirmPassword}
-                  />
-                  <ErrorMessage name="confirmPassword" component="span" />
-                </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Número de Teléfono "
+                name="tel"
+                type="number"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="tel">Número de Teléfono: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="tel"
-                    as="input"
-                    error={formik.errors.tel}
-                  />
-                  <ErrorMessage name="tel" component="span" />
-                </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Número de Celular "
+                name="cel"
+                type="number"
+                className={styles.formInput}
+              />
+            </div>
+          </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="cel">Número de Celular: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="cel"
-                    as="input"
-                    error={formik.errors.cel}
-                  />
-                  <ErrorMessage name="cel" component="span" />
-                </div>
+          <button
+            className={styles.btnGrad}
+            type="button"
+            onClick={() => props.prev(formik.values)}
+          >
+            Back
+          </button>
 
-              </div>
-
-              <button
-                className={styles.btnGrad}
-                type="button"
-                onClick={()=> props.prev(formik.values)}
-              >
-                Back
-              </button>
-
-              <button
-                className={styles.btnGrad}
-                type="submit"
-                disabled={!formik.isValid || !formik.dirty}
-              >
-                Next
-              </button>
-            
-          </Form>
-        )
-      }
+          <button
+            className={styles.btnGrad}
+            type="submit"
+            disabled={!formik.isValid || !formik.dirty}
+          >
+            Next
+          </button>
+        </Form>
+      )}
     </Formik>
-  )
-}
+  );
+};
 
-const StepThree = (props:any)=> { //review this type
+const StepThree = (props: any) => {
+  //review this type
   const handleSubmit = (values: FormValues) => {
     console.log(values);
-    props.next(values, true)
-    //formik.resetForm();
+    props.next(values, true);
   };
 
-  return(
+  return (
     <Formik
       initialValues={props.data}
       onSubmit={handleSubmit}
-      validationSchema={stepThreeSchema}>
-      {
-        (formik)=>(
-          <Form>
-             
-              <div className={styles.userInfo}>
-         
-                <div className={styles.inputBox}>
-                  <label htmlFor="address">Dirección de Residencia: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="address"
-                    as="input"
-                    error={formik.errors.address}
-                  />
-                  <ErrorMessage name="address" component="span" />
-                </div>
+      validationSchema={stepThreeSchema}
+      label="step 3"
+    >
+      {(formik) => (
+        <Form>
+          <div className={styles.userInfo}>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Dirección de Residencia "
+                name="address"
+                type="text"
+                className={styles.formInput}
+              />
+            </div>
 
-                <div className={styles.inputBox}>
-                  <label htmlFor="zipCode">Código Postal: </label>
-                  <Field
-                    className={styles.formInput}
-                    name="zipCode"
-                    as="input"
-                    error={formik.errors.zipCode}
-                  />
-                  <ErrorMessage name="zipCode" component="span" />
-                </div>
-              </div>
+            <div className={styles.inputBox}>
+              <FormInput
+                label="Código Postal "
+                name="zipCode"
+                type="number"
+                className={styles.formInput}
+              />
+            </div>
+          </div>
 
-              <button
-                className={styles.btnGrad}
-                type="button"
-                onClick={()=> props.prev(formik.values)}
-              >
-                Back
-              </button>
+          <button
+            className={styles.btnGrad}
+            type="button"
+            onClick={() => props.prev(formik.values)}
+          >
+            Back
+          </button>
 
-              <button
-                className={styles.btnGrad}
-                type="submit"
-                disabled={!formik.isValid || !formik.dirty}
-              >
-                Submit
-              </button>
-            
-          </Form>
-        )
-      }
+          <button
+            className={styles.btnGrad}
+            type="submit"
+            disabled={!formik.isValid || !formik.dirty}
+          >
+            Submit
+          </button>
+        </Form>
+      )}
     </Formik>
-  )
-}
+  );
+};
